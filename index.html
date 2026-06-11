@@ -60,7 +60,6 @@ main{position:relative;z-index:1;padding:20px 12px 100px;max-width:700px;margin:
   margin:18px 0 8px 4px;display:flex;align-items:center;gap:8px}
 .section-label::after{content:'';flex:1;height:1px;background:var(--card-border)}
 
-/* EJERCICIO CARD */
 .card{background:var(--card-bg);border:1px solid var(--card-border);
   border-radius:var(--radius);margin-bottom:12px;overflow:hidden;
   backdrop-filter:blur(8px);transition:border-color .2s}
@@ -101,7 +100,6 @@ main{position:relative;z-index:1;padding:20px 12px 100px;max-width:700px;margin:
   border-radius:10px;transition:width .4s ease}
 .progreso-texto{font-size:.72rem;color:var(--text-muted);text-align:right}
 
-/* ASISTENCIA */
 .mes-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
 .mes-header{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
 .mes-header span{text-align:center;font-size:.6rem;font-weight:700;
@@ -134,7 +132,6 @@ main{position:relative;z-index:1;padding:20px 12px 100px;max-width:700px;margin:
 .stat-num{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--teal-300)}
 .stat-label{font-size:.68rem;color:var(--text-muted);margin-top:2px}
 
-/* PESO */
 .peso-form{background:var(--card-bg);border:1px solid var(--card-border);
   border-radius:var(--radius);padding:16px;margin-bottom:16px;backdrop-filter:blur(8px)}
 .peso-form label{display:block;font-size:.75rem;font-weight:600;
@@ -159,7 +156,6 @@ main{position:relative;z-index:1;padding:20px 12px 100px;max-width:700px;margin:
 .peso-diff.igual{background:rgba(100,116,139,.15);color:#94a3b8}
 .peso-del{background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:.9rem;padding:4px}
 
-/* CONSEJOS */
 .consejo{background:rgba(20,184,166,.08);border:1px solid var(--card-border);
   border-radius:12px;padding:12px 14px;margin-bottom:10px;
   font-size:.83rem;color:var(--text-muted);line-height:1.5;display:flex;gap:8px}
@@ -184,7 +180,7 @@ main{position:relative;z-index:1;padding:20px 12px 100px;max-width:700px;margin:
     <div class="header-top">
       <h1>💪 Mi<span>Gym</span></h1>
       <div class="header-right">
-        <button class="install-btn" id="installBtn" onclick="installApp()">⬇️ Instalar</button>
+        <button class="install-btn" id="installBtn">📲 Instalar App</button>
         <span class="dia-badge" id="diaBadge"></span>
       </div>
     </div>
@@ -193,10 +189,10 @@ main{position:relative;z-index:1;padding:20px 12px 100px;max-width:700px;margin:
 
 <div class="tabs-wrap">
   <div class="tabs-inner">
-  <button class="tab-btn active" onclick="setTab('gym',this)">🏋️ Gym Libre</button>
-  <button class="tab-btn" onclick="setTab('asistencia',this)">📅 Asistencia</button>
-  <button class="tab-btn" onclick="setTab('peso',this)">⚖️ Mi Peso</button>
-  <button class="tab-btn" onclick="setTab('consejos',this)">💡 Consejos</button>
+    <button class="tab-btn active" data-tab="gym">🏋️ Gym Libre</button>
+    <button class="tab-btn" data-tab="asistencia">📅 Asistencia</button>
+    <button class="tab-btn" data-tab="peso">⚖️ Mi Peso</button>
+    <button class="tab-btn" data-tab="consejos">💡 Consejos</button>
   </div>
 </div>
 
@@ -204,389 +200,70 @@ main{position:relative;z-index:1;padding:20px 12px 100px;max-width:700px;margin:
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── DATOS EJERCICIOS ─────────────────────────────────────────────────────────
 const EJERCICIOS = {
-  calentamiento:[
-    {id:'c1',icono:'🔥',nombre:'Calentamiento articular',series:'1 ronda',duracion:'5 min',
-     descripcion:'Movilización suave de todas las articulaciones antes de empezar.',
-     pasos:['Rotaciones de cuello: 5 veces a cada lado, lento y suave',
-            'Rotaciones de hombros: 10 hacia adelante y 10 hacia atrás',
-            'Rotaciones de muñecas: 10 veces a cada lado (suave por la artrosis)',
-            'Rotaciones de caderas: 10 círculos a cada lado',
-            'Rotaciones de tobillos: 10 veces a cada pie',
-            'Marcha en el sitio: 1 minuto levantando rodillas suavemente'],
-     cuidado:'Muñecas: movimientos muy suaves. Para si sientes dolor agudo.'}
-  ],
-  cardio:[
-    {id:'l1',icono:'🚴',nombre:'Bicicleta estática',series:'20-30 min',duracion:'20-30 min',
-     descripcion:'Cardio ideal: sin impacto en pies y excelente para bajar glucosa y triglicéridos.',
-     pasos:['Ajusta el sillín: rodilla ligeramente doblada al fondo del pedaleo',
-            'Empieza 5 min a ritmo muy suave para calentar',
-            'Sube a ritmo moderado: puedes hablar pero notas el esfuerzo',
-            'Mantén 20-25 min a ritmo constante',
-            'Últimos 5 min baja el ritmo para enfriar'],
-     cuidado:'Fascitis plantar: apoya bien el pie en el pedal, pedalea con la parte media.'},
-    {id:'l2',icono:'🚶',nombre:'Cinta andadora (caminar)',series:'20-25 min',duracion:'20-25 min',
-     descripcion:'Caminar rápido en cinta. Sin correr — igual de efectivo y sin impacto.',
-     pasos:['Velocidad: 4.5-5.5 km/h (paso rápido, nunca correr)',
-            'Inclinación: 1-2% para simular terreno real',
-            'Postura: espalda recta, mirada al frente, brazos en movimiento',
-            'Camina 20-25 minutos continuos',
-            'Para si el pie molesta'],
-     cuidado:'Fascitis: usa calzado con buena amortiguación. Para si duele el talón.'}
-  ],
-  maquinas:[
-    {id:'m1',icono:'🦵',nombre:'Leg press (prensa de piernas)',series:'3×12 rep',duracion:'12 min',
-     descripcion:'Trabaja cuádriceps y glúteos sin carga en columna.',
-     pasos:['Ajusta el asiento: rodillas a 90° en posición inicial',
-            'Pies al ancho de hombros en la plataforma',
-            'Empuja extendiendo las piernas sin bloquear rodillas',
-            'Baja lentamente hasta 90° de flexión',
-            'Empieza con poco peso y aumenta gradualmente'],
-     cuidado:'Fascitis: apoya bien toda la planta en la plataforma.'},
-    {id:'m2',icono:'🏋️',nombre:'Remo en máquina (espalda)',series:'3×12 rep',duracion:'12 min',
-     descripcion:'Fortalece espalda media y mejora postura. Muy recomendado.',
-     pasos:['Siéntate erguido, pecho contra el soporte',
-            'Agarra las asas, codos hacia atrás',
-            'Tira hacia el abdomen apretando los omóplatos',
-            'Extiende los brazos lentamente volviendo al inicio',
-            'Espalda recta durante todo el movimiento'],
-     cuidado:'Artrosis: agarre suave. Usa guantes con acolchado si las asas duelen.'},
-    {id:'m3',icono:'🦵',nombre:'Extensión de cuádriceps',series:'3×12 rep',duracion:'10 min',
-     descripcion:'Aísla y fortalece la parte delantera del muslo.',
-     pasos:['Siéntate con espalda bien apoyada',
-            'Coloca los tobillos bajo el rodillo acolchado',
-            'Extiende las piernas hacia arriba lentamente',
-            'Aguanta 1 segundo arriba y baja controlando',
-            'Mejor muchas repeticiones que mucho peso'],
-     cuidado:null},
-    {id:'m4',icono:'🦵',nombre:'Curl femoral (isquiotibiales)',series:'3×12 rep',duracion:'10 min',
-     descripcion:'Trabaja la parte posterior del muslo.',
-     pasos:['Colócate según la máquina (tumbado o sentado)',
-            'Coloca los tobillos bajo el rodillo',
-            'Dobla las rodillas llevando talones hacia glúteos',
-            'Baja lentamente y con control',
-            'Peso ligero, movimiento controlado'],
-     cuidado:null},
-    {id:'m5',icono:'💪',nombre:'Polea alta (jalón al pecho)',series:'3×10 rep',duracion:'10 min',
-     descripcion:'Trabaja dorsal y bíceps. Excelente para espalda y postura.',
-     pasos:['Siéntate con muslos bajo el soporte, agarra la barra ancha',
-            'Tira hacia el pecho (nunca detrás del cuello)',
-            'Mantén espalda ligeramente inclinada hacia atrás',
-            'Sube lentamente controlando el peso',
-            'Agarre neutro (palmas enfrentadas) si las muñecas molestan'],
-     cuidado:'Artrosis: usa agarre neutro si el ancho duele.'}
-  ],
-  estiramientos:[
-    {id:'e1',icono:'🧘',nombre:'Estiramientos finales',series:'1 ronda',duracion:'8 min',
-     descripcion:'Imprescindibles para recuperar y evitar agujetas.',
-     pasos:['Dorsal: agárrate a algo fijo, inclina el cuerpo y estira. 30 seg',
-            'Cuádriceps: de pie, dobla una rodilla, talón al glúteo. 30 seg cada lado',
-            'Isquiotibiales: sentado, estira la pierna y alcanza el pie. 30 seg',
-            'Pecho: brazos abiertos hacia atrás, abre el pecho. 30 seg',
-            '5 respiraciones profundas para cerrar la sesión'],
-     cuidado:null}
-  ]
+  calentamiento:[{id:'c1',icono:'🔥',nombre:'Calentamiento articular',series:'1 ronda',duracion:'5 min',descripcion:'Movilización suave de todas las articulaciones.',pasos:['Rotaciones de cuello: 5 veces','Rotaciones de hombros: 10','Rotaciones de muñecas: 10','Rotaciones de caderas: 10','Rotaciones de tobillos: 10','Marcha en sitio: 1 min'],cuidado:'Muñecas: movimientos suaves'}],
+  cardio:[{id:'l1',icono:'🚴',nombre:'Bicicleta estática',series:'20-30 min',duracion:'20-30 min',descripcion:'Cardio sin impacto.',pasos:['Ajusta sillín','5 min suave','20-25 min ritmo moderado','5 min enfriamiento'],cuidado:'Apoya bien el pie'},{id:'l2',icono:'🚶',nombre:'Cinta andadora',series:'20-25 min',duracion:'20-25 min',descripcion:'Caminar rápido.',pasos:['Velocidad 4.5-5.5 km/h','Inclinación 1-2%','20-25 min','Para si duele el pie'],cuidado:'Usa calzado amortiguado'}],
+  maquinas:[{id:'m1',icono:'🦵',nombre:'Leg press',series:'3×12 rep',duracion:'12 min',descripcion:'Trabaja cuádriceps y glúteos.',pasos:['Ajusta asiento','Pies al ancho hombros','Empuja sin bloquear','Baja lentamente'],cuidado:'Apoya toda la planta'},{id:'m2',icono:'🏋️',nombre:'Remo máquina',series:'3×12 rep',duracion:'12 min',descripcion:'Fortalece espalda.',pasos:['Siéntate erguido','Tira al abdomen','Aprieta omóplatos','Vuelve lento'],cuidado:'Agarre suave'},{id:'m3',icono:'🦵',nombre:'Extensión cuádriceps',series:'3×12 rep',duracion:'10 min',descripcion:'Aísla muslo anterior.',pasos:['Espalda apoyada','Extiende piernas','Aguanta 1 segundo','Baja controlado'],cuidado:null},{id:'m4',icono:'🦵',nombre:'Curl femoral',series:'3×12 rep',duracion:'10 min',descripcion:'Trabaja isquiotibiales.',pasos:['Tobillos bajo rodillo','Dobla rodillas','Baja lento'],cuidado:null},{id:'m5',icono:'💪',nombre:'Polea alta',series:'3×10 rep',duracion:'10 min',descripcion:'Trabaja dorsal.',pasos:['Agarre ancho','Tira al pecho','Sube controlado'],cuidado:'Agarre neutro si duele'}],
+  estiramientos:[{id:'e1',icono:'🧘',nombre:'Estiramientos finales',series:'1 ronda',duracion:'8 min',descripcion:'Evita agujetas.',pasos:['Estira dorsal 30s','Estira cuádriceps 30s','Estira isquiotibiales 30s','Abre pecho 30s','Respiración 5 veces'],cuidado:null}]
 };
-
-const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
-                  'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 const DIAS_ES = ['L','M','X','J','V','S','D'];
-
-// ─── STATE ────────────────────────────────────────────────────────────────────
 let activeTab = 'gym';
 let completados = JSON.parse(localStorage.getItem('migym_ej') || '{}');
 let asistencia = JSON.parse(localStorage.getItem('migym_asist') || '{}');
 let pesos = JSON.parse(localStorage.getItem('migym_pesos') || '[]');
-let tipoSel = 'profe'; // para marcar asistencia
+let tipoSel = 'profe';
 let calMes = new Date().getMonth();
 let calAnio = new Date().getFullYear();
-
 const hoy = new Date();
-const diasGym = [1,3,5]; // lunes=1, miércoles=3, viernes=5
+const diasGym = [1,3,5];
 const esGymHoy = diasGym.includes(hoy.getDay());
-document.getElementById('diaBadge').textContent =
-  MESES_ES[hoy.getMonth()].slice(0,3) + ' ' + hoy.getDate() + (esGymHoy ? ' 💪' : '');
+document.getElementById('diaBadge').textContent = MESES_ES[hoy.getMonth()].slice(0,3) + ' ' + hoy.getDate() + (esGymHoy ? ' 💪' : '');
 
-// ─── TABS ─────────────────────────────────────────────────────────────────────
-function setTab(tab, btn) {
-  activeTab = tab;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-}
+function setTab(tab, btn) { activeTab = tab; document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); render(); }
+function render() { const m = document.getElementById('main'); if (activeTab==='gym') renderGym(m); else if (activeTab==='asistencia') renderAsistencia(m); else if (activeTab==='peso') renderPeso(m); else renderConsejos(m); }
+function renderGym(m) { const todos = [...EJERCICIOS.calentamiento,...EJERCICIOS.cardio,...EJERCICIOS.maquinas,...EJERCICIOS.estiramientos]; const hechos = todos.filter(e=>completados[e.id]).length; const pct = Math.round((hechos/todos.length)*100); m.innerHTML = `<div class="progreso-wrap"><div class="progreso-titulo">Progreso de la sesión</div><div class="progreso-bar"><div class="progreso-fill" style="width:${pct}%"></div></div><div class="progreso-texto">${hechos} de ${todos.length} completados (${pct}%)</div></div>` + seccion('🔥 Calentamiento', EJERCICIOS.calentamiento) + seccion('🚴 Cardio', EJERCICIOS.cardio) + seccion('🏋️ Máquinas', EJERCICIOS.maquinas) + seccion('🧘 Estiramientos', EJERCICIOS.estiramientos) + `<button class="reset-btn" onclick="resetGym()">🔄 Reiniciar sesión</button>`; bindCards(); }
+function seccion(titulo, lista) { return `<div class="section-label">${titulo}</div>` + lista.map(cardHTML).join(''); }
+function cardHTML(e) { const done = completados[e.id]?'done':''; const check = completados[e.id]?'✓':e.icono; return `<div class="card ${done}" id="card_${e.id}"><div class="card-header"><div class="card-check" data-id="${e.id}">${check}</div><div class="card-info"><div class="card-title">${e.nombre}</div><div class="card-meta"><span class="meta-badge">${e.series}</span><span class="meta-badge">${e.duracion}</span></div></div><span class="card-arrow">▶</span></div><div class="card-body"><div class="descripcion">${e.descripcion}</div><ul class="pasos-list">${e.pasos.map((p,i)=>`<li class="paso"><span class="paso-num">${i+1}</span><span>${p}</span></li>`).join('')}</ul>${e.cuidado?`<div class="cuidado">⚠️ <span>${e.cuidado}</span></div>`:''}</div></div>`; }
+function bindCards() { document.querySelectorAll('.card-check').forEach(btn=>{ btn.addEventListener('click',e=>{ e.stopPropagation(); const id=btn.dataset.id; completados[id]=!completados[id]; localStorage.setItem('migym_ej',JSON.stringify(completados)); showToast(completados[id]?'✅ ¡Completado!':'↩️ Desmarcado'); renderGym(document.getElementById('main')); }); }); document.querySelectorAll('.card-header').forEach(h=>{ h.addEventListener('click',e=>{ if(e.target.closest('.card-check'))return; const card=h.closest('.card'); card.classList.toggle('expanded'); }); }); }
+function resetGym(){ completados={}; localStorage.setItem('migym_ej',JSON.stringify(completados)); renderGym(document.getElementById('main')); showToast('🔄 Sesión reiniciada'); }
+function renderAsistencia(m) { const año=calAnio, mes=calMes; const primerDia=new Date(año,mes,1).getDay(); const offset=primerDia===0?6:primerDia-1; const diasMes=new Date(año,mes+1,0).getDate(); const prefix=`${año}-${String(mes+1).padStart(2,'0')}`; let cntProfe=0,cntLibre=0,cntAmbos=0; for(let d=1;d<=diasMes;d++){ const key=`${prefix}-${String(d).padStart(2,'0')}`; const v=asistencia[key]; if(v==='ambos')cntAmbos++; else if(v==='profe')cntProfe++; else if(v==='libre')cntLibre++; } m.innerHTML = `<div class="stats-row"><div class="stat-card"><div class="stat-num">${cntProfe+cntAmbos}</div><div class="stat-label">Con Profesor</div></div><div class="stat-card"><div class="stat-num">${cntLibre+cntAmbos}</div><div class="stat-label">Gym Libre</div></div><div class="stat-card"><div class="stat-num">${cntProfe+cntLibre+cntAmbos}</div><div class="stat-label">Total días</div></div></div><div class="card" style="padding:14px 16px;margin-bottom:14px"><div class="mes-nav"><button onclick="cambiaMes(-1)">◀</button><span>${MESES_ES[mes]} ${año}</span><button onclick="cambiaMes(1)">▶</button></div><p style="font-size:.75rem;color:var(--text-muted);margin-bottom:10px">Pulsa un día para marcar tu asistencia:</p><div class="tipo-btns"><button class="tipo-btn ${tipoSel==='profe'?'sel-profe':''}" onclick="selTipo('profe',this)">🧘 Con Profesor</button><button class="tipo-btn ${tipoSel==='libre'?'sel-libre':''}" onclick="selTipo('libre',this)">🏋️ Gym Libre</button></div><div class="mes-header">${DIAS_ES.map(d=>`<span>${d}</span>`).join('')}</div><div class="mes-grid">${Array(offset).fill('<div class="dia-cal vacio"></div>').join('')}${Array.from({length:diasMes},(_,i)=>{ const d=i+1; const key=`${prefix}-${String(d).padStart(2,'0')}`; const v=asistencia[key]||''; let claseExtra=''; if(v==='profe') claseExtra='profe'; else if(v==='libre') claseExtra='libre'; else if(v==='ambos') claseExtra='ambos'; const hoyClass=(d===hoy.getDate()&&mes===hoy.getMonth()&&año===hoy.getFullYear())?'hoy':''; return `<div class="dia-cal ${claseExtra} ${hoyClass}" onclick="toggleDia('${key}')">${d}</div>`; }).join('')}</div></div><div class="leyenda"><div class="leyenda-item"><div class="leyenda-dot" style="background:var(--teal-700)"></div>Con Profesor</div><div class="leyenda-item"><div class="leyenda-dot" style="background:rgba(245,158,11,.3)"></div>Gym Libre</div><div class="leyenda-item"><div class="leyenda-dot" style="background:linear-gradient(135deg,var(--teal-700),rgba(245,158,11,.5))"></div>Ambos</div></div>`; }
+function selTipo(tipo,btn){ tipoSel=tipo; document.querySelectorAll('.tipo-btn').forEach(b=>b.className='tipo-btn'); btn.classList.add(tipo==='profe'?'sel-profe':'sel-libre'); }
+function toggleDia(key){ const v=asistencia[key]||''; if(!v) asistencia[key]=tipoSel; else if(v===tipoSel) delete asistencia[key]; else if((v==='profe'&&tipoSel==='libre')||(v==='libre'&&tipoSel==='profe')) asistencia[key]='ambos'; else delete asistencia[key]; localStorage.setItem('migym_asist',JSON.stringify(asistencia)); renderAsistencia(document.getElementById('main')); }
+function cambiaMes(dir){ calMes+=dir; if(calMes>11){calMes=0;calAnio++;} if(calMes<0){calMes=11;calAnio--;} renderAsistencia(document.getElementById('main')); }
+function renderPeso(m){ const mesActual=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`; const yaHoy=pesos.find(p=>p.mes===mesActual); m.innerHTML=`<div class="peso-form"><label>Registrar peso de ${MESES_ES[hoy.getMonth()]} ${hoy.getFullYear()}</label><div class="peso-input-row"><input class="peso-input" type="number" id="pesoInput" step="0.1" min="40" max="200" placeholder="${yaHoy?yaHoy.kg+' kg':'ej: 82.5'}" value="${yaHoy?yaHoy.kg:''}"><button class="peso-save-btn" onclick="guardarPeso()">💾 Guardar</button></div></div>${pesos.length===0?`<div class="consejo"><span class="consejo-icon">⚖️</span><span>Aún no hay registros.</span></div>`:`<div class="section-label">📊 Evolución del peso</div><div class="card" style="overflow:visible"><ul class="peso-list" style="padding:0 16px">${[...pesos].reverse().map((p,i,arr)=>{ const prev=arr[i+1]; let diff='',diffClass='igual'; if(prev){ const d=(p.kg-prev.kg).toFixed(1); diff=d>0?`+${d} kg`:d<0?`${d} kg`:'='; diffClass=d<0?'baja':d>0?'sube':'igual'; } return `<li class="peso-item"><span class="peso-mes">${p.label}</span><span class="peso-val">${p.kg} kg</span><span class="peso-diff ${diffClass}">${diff}</span><button class="peso-del" onclick="borrarPeso('${p.mes}')">🗑️</button></li>`; }).join('')}</ul></div>`}`; }
+function guardarPeso(){ const val=parseFloat(document.getElementById('pesoInput').value); if(isNaN(val)||val<40||val>200){showToast('⚠️ Peso no válido');return;} const mes=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`; const label=`${MESES_ES[hoy.getMonth()]} ${hoy.getFullYear()}`; pesos=pesos.filter(p=>p.mes!==mes); pesos.push({mes,label,kg:val}); pesos.sort((a,b)=>a.mes.localeCompare(b.mes)); localStorage.setItem('migym_pesos',JSON.stringify(pesos)); showToast('✅ Peso guardado'); renderPeso(document.getElementById('main')); }
+function borrarPeso(mes){ pesos=pesos.filter(p=>p.mes!==mes); localStorage.setItem('migym_pesos',JSON.stringify(pesos)); renderPeso(document.getElementById('main')); }
+function renderConsejos(m){ const lista=[{i:'💊',t:'Toma la pastilla de tensión antes del gym.'},{i:'💧',t:'Bebe mínimo 500ml de agua.'},{i:'🦶',t:'Fascitis: usa plantillas de gel.'},{i:'🤲',t:'Artrosis: guantes con acolchado.'},{i:'🍽️',t:'Desayuna bien 1 hora antes.'},{i:'📈',t:'Bicicleta y caminar bajan glucosa.'},{i:'😴',t:'El descanso es parte del entrenamiento.'},{i:'⏱️',t:'No aumentes más del 10% por semana.'},{i:'🧘',t:'Estiramientos no son opcionales.'},{i:'❤️',t:'Si notas mareos, para y consulta.'}]; m.innerHTML=`<div class="section-label">💡 Consejos para ti</div>`+lista.map(c=>`<div class="consejo"><span class="consejo-icon">${c.i}</span><span>${c.t}</span></div>`).join(''); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg;t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
 
-function render() {
-  const m = document.getElementById('main');
-  if (activeTab==='gym') renderGym(m);
-  else if (activeTab==='asistencia') renderAsistencia(m);
-  else if (activeTab==='peso') renderPeso(m);
-  else renderConsejos(m);
-}
+document.querySelectorAll('.tab-btn').forEach(btn => { btn.addEventListener('click', () => setTab(btn.dataset.tab, btn)); });
 
-// ─── GYM ──────────────────────────────────────────────────────────────────────
-function renderGym(m) {
-  const todos = [...EJERCICIOS.calentamiento,...EJERCICIOS.cardio,...EJERCICIOS.maquinas,...EJERCICIOS.estiramientos];
-  const hechos = todos.filter(e=>completados[e.id]).length;
-  const pct = Math.round((hechos/todos.length)*100);
-  m.innerHTML =
-    `<div class="progreso-wrap">
-      <div class="progreso-titulo">Progreso de la sesión</div>
-      <div class="progreso-bar"><div class="progreso-fill" style="width:${pct}%"></div></div>
-      <div class="progreso-texto">${hechos} de ${todos.length} completados (${pct}%)</div>
-    </div>` +
-    seccion('🔥 Calentamiento', EJERCICIOS.calentamiento) +
-    seccion('🚴 Cardio', EJERCICIOS.cardio) +
-    seccion('🏋️ Máquinas', EJERCICIOS.maquinas) +
-    seccion('🧘 Estiramientos', EJERCICIOS.estiramientos) +
-    `<button class="reset-btn" onclick="resetGym()">🔄 Reiniciar sesión</button>`;
-  bindCards();
-}
-
-function seccion(titulo, lista) {
-  return `<div class="section-label">${titulo}</div>` + lista.map(cardHTML).join('');
-}
-
-function cardHTML(e) {
-  const done = completados[e.id]?'done':'';
-  const check = completados[e.id]?'✓':e.icono;
-  return `<div class="card ${done}" id="card_${e.id}">
-    <div class="card-header">
-      <div class="card-check" data-id="${e.id}">${check}</div>
-      <div class="card-info">
-        <div class="card-title">${e.nombre}</div>
-        <div class="card-meta">
-          <span class="meta-badge">${e.series}</span>
-          <span class="meta-badge">${e.duracion}</span>
-        </div>
-      </div>
-      <span class="card-arrow">▶</span>
-    </div>
-    <div class="card-body">
-      <div class="descripcion">${e.descripcion}</div>
-      <ul class="pasos-list">${e.pasos.map((p,i)=>`<li class="paso"><span class="paso-num">${i+1}</span><span>${p}</span></li>`).join('')}</ul>
-      ${e.cuidado?`<div class="cuidado">⚠️ <span>${e.cuidado}</span></div>`:''}
-    </div>
-  </div>`;
-}
-
-function bindCards() {
-  document.querySelectorAll('.card-check').forEach(btn=>{
-    btn.addEventListener('click',e=>{
-      e.stopPropagation();
-      const id=btn.dataset.id;
-      completados[id]=!completados[id];
-      localStorage.setItem('migym_ej',JSON.stringify(completados));
-      showToast(completados[id]?'✅ ¡Completado!':'↩️ Desmarcado');
-      renderGym(document.getElementById('main'));
-    });
-  });
-  document.querySelectorAll('.card-header').forEach(h=>{
-    h.addEventListener('click',e=>{
-      if(e.target.closest('.card-check'))return;
-      const card=h.closest('.card');
-      card.classList.toggle('expanded');
-    });
-  });
-}
-
-function resetGym(){
-  completados={};
-  localStorage.setItem('migym_ej',JSON.stringify(completados));
-  renderGym(document.getElementById('main'));
-  showToast('🔄 Sesión reiniciada');
-}
-
-// ─── ASISTENCIA (CORREGIDA) ───────────────────────────────────────────────────
-function renderAsistencia(m) {
-  const año = calAnio, mes = calMes;
-  const primerDia = new Date(año, mes, 1).getDay();
-  const offset = primerDia === 0 ? 6 : primerDia - 1;
-  const diasMes = new Date(año, mes + 1, 0).getDate();
-
-  const prefix = `${año}-${String(mes + 1).padStart(2, '0')}`;
-  let cntProfe = 0, cntLibre = 0, cntAmbos = 0;
-  for (let d = 1; d <= diasMes; d++) {
-    const key = `${prefix}-${String(d).padStart(2, '0')}`;
-    const v = asistencia[key];
-    if (v === 'ambos') cntAmbos++;
-    else if (v === 'profe') cntProfe++;
-    else if (v === 'libre') cntLibre++;
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBtn').style.display = 'flex';
+});
+document.getElementById('installBtn').addEventListener('click', () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+  } else {
+    showToast('📱 Usa el menú del navegador → Añadir a pantalla inicio');
   }
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBtn').style.display = 'none';
+  deferredPrompt = null;
+});
 
-  m.innerHTML = `
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-num">${cntProfe + cntAmbos}</div><div class="stat-label">Con Profesor</div></div>
-      <div class="stat-card"><div class="stat-num">${cntLibre + cntAmbos}</div><div class="stat-label">Gym Libre</div></div>
-      <div class="stat-card"><div class="stat-num">${cntProfe + cntLibre + cntAmbos}</div><div class="stat-label">Total días</div></div>
-    </div>
-    <div class="card" style="padding:14px 16px;margin-bottom:14px">
-      <div class="mes-nav">
-        <button onclick="cambiaMes(-1)">◀</button>
-        <span>${MESES_ES[mes]} ${año}</span>
-        <button onclick="cambiaMes(1)">▶</button>
-      </div>
-      <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:10px">Pulsa un día para marcar tu asistencia:</p>
-      <div class="tipo-btns">
-        <button class="tipo-btn ${tipoSel === 'profe' ? 'sel-profe' : ''}" onclick="selTipo('profe', this)">🧘 Con Profesor</button>
-        <button class="tipo-btn ${tipoSel === 'libre' ? 'sel-libre' : ''}" onclick="selTipo('libre', this)">🏋️ Gym Libre</button>
-      </div>
-      <div class="mes-header">${DIAS_ES.map(d => `<span>${d}</span>`).join('')}</div>
-      <div class="mes-grid">
-        ${Array(offset).fill('<div class="dia-cal vacio"></div>').join('')}
-        ${Array.from({ length: diasMes }, (_, i) => {
-          const d = i + 1;
-          const key = `${prefix}-${String(d).padStart(2, '0')}`;
-          const v = asistencia[key] || '';
-          let claseExtra = '';
-          if (v === 'profe') claseExtra = 'profe';
-          else if (v === 'libre') claseExtra = 'libre';
-          else if (v === 'ambos') claseExtra = 'ambos';
-          const hoyClass = (d === hoy.getDate() && mes === hoy.getMonth() && año === hoy.getFullYear()) ? 'hoy' : '';
-          return `<div class="dia-cal ${claseExtra} ${hoyClass}" onclick="toggleDia('${key}')">${d}</div>`;
-        }).join('')}
-      </div>
-    </div>
-    <div class="leyenda">
-      <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--teal-700)"></div>Con Profesor</div>
-      <div class="leyenda-item"><div class="leyenda-dot" style="background:rgba(245,158,11,.3)"></div>Gym Libre</div>
-      <div class="leyenda-item"><div class="leyenda-dot" style="background:linear-gradient(135deg,var(--teal-700),rgba(245,158,11,.5))"></div>Ambos</div>
-    </div>
-  `;
-}
-
-function selTipo(tipo, btn) {
-  tipoSel=tipo;
-  document.querySelectorAll('.tipo-btn').forEach(b=>b.className='tipo-btn');
-  btn.classList.add(tipo==='profe'?'sel-profe':'sel-libre');
-}
-
-function toggleDia(key) {
-  const v=asistencia[key]||'';
-  if(!v) asistencia[key]=tipoSel;
-  else if(v===tipoSel) delete asistencia[key];
-  else if((v==='profe'&&tipoSel==='libre')||(v==='libre'&&tipoSel==='profe')) asistencia[key]='ambos';
-  else delete asistencia[key];
-  localStorage.setItem('migym_asist',JSON.stringify(asistencia));
-  renderAsistencia(document.getElementById('main'));
-}
-
-function cambiaMes(dir) {
-  calMes+=dir;
-  if(calMes>11){calMes=0;calAnio++;}
-  if(calMes<0){calMes=11;calAnio--;}
-  renderAsistencia(document.getElementById('main'));
-}
-
-// ─── PESO ─────────────────────────────────────────────────────────────────────
-function renderPeso(m) {
-  const mesActual=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
-  const yaHoy=pesos.find(p=>p.mes===mesActual);
-
-  m.innerHTML=`
-    <div class="peso-form">
-      <label>Registrar peso de ${MESES_ES[hoy.getMonth()]} ${hoy.getFullYear()}</label>
-      <div class="peso-input-row">
-        <input class="peso-input" type="number" id="pesoInput" step="0.1" min="40" max="200"
-          placeholder="${yaHoy?yaHoy.kg+' kg':'ej: 82.5'}" value="${yaHoy?yaHoy.kg:''}">
-        <button class="peso-save-btn" onclick="guardarPeso()">💾 Guardar</button>
-      </div>
-    </div>
-    ${pesos.length===0?
-      `<div class="consejo"><span class="consejo-icon">⚖️</span><span>Aún no hay registros. Añade tu peso de este mes para empezar a ver la evolución.</span></div>`:
-      `<div class="section-label">📊 Evolución del peso</div>
-       <div class="card" style="overflow:visible">
-        <ul class="peso-list" style="padding:0 16px">
-          ${[...pesos].reverse().map((p,i,arr)=>{
-            const prev=arr[i+1];
-            let diff='',diffClass='igual';
-            if(prev){
-              const d=(p.kg-prev.kg).toFixed(1);
-              diff=d>0?`+${d} kg`:d<0?`${d} kg`:'=';
-              diffClass=d<0?'baja':d>0?'sube':'igual';
-            }
-            return `<li class="peso-item">
-              <span class="peso-mes">${p.label}</span>
-              <span class="peso-val">${p.kg} kg</span>
-              <span class="peso-diff ${diffClass}">${diff}</span>
-              <button class="peso-del" onclick="borrarPeso('${p.mes}')">🗑️</button>
-            </li>`;
-          }).join('')}
-        </ul>
-       </div>`
-    }`;
-}
-
-function guardarPeso() {
-  const val=parseFloat(document.getElementById('pesoInput').value);
-  if(isNaN(val)||val<40||val>200){showToast('⚠️ Peso no válido');return;}
-  const mes=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
-  const label=`${MESES_ES[hoy.getMonth()]} ${hoy.getFullYear()}`;
-  pesos=pesos.filter(p=>p.mes!==mes);
-  pesos.push({mes,label,kg:val});
-  pesos.sort((a,b)=>a.mes.localeCompare(b.mes));
-  localStorage.setItem('migym_pesos',JSON.stringify(pesos));
-  showToast('✅ Peso guardado');
-  renderPeso(document.getElementById('main'));
-}
-
-function borrarPeso(mes) {
-  pesos=pesos.filter(p=>p.mes!==mes);
-  localStorage.setItem('migym_pesos',JSON.stringify(pesos));
-  renderPeso(document.getElementById('main'));
-}
-
-// ─── CONSEJOS ────────────────────────────────────────────────────────────────
-function renderConsejos(m) {
-  const lista=[
-    {i:'💊',t:'Toma la pastilla de tensión antes del gym, no después. El ejercicio ya la baja ligeramente.'},
-    {i:'💧',t:'Bebe mínimo 500ml de agua durante el entrenamiento. Con glucosa alta la hidratación es clave.'},
-    {i:'🦶',t:'Fascitis plantar: usa plantillas de gel. Estira el pie al levantarte por la mañana antes del primer paso.'},
-    {i:'🤲',t:'Artrosis de manos: no aprietes fuerte los agarres. Guantes con acolchado ayudan mucho.'},
-    {i:'🍽️',t:'Días de gym: desayuna bien 1 hora antes. Avena con leche semidesnatada o huevos son ideales.'},
-    {i:'📈',t:'La bicicleta y caminar bajan directamente la glucosa y los triglicéridos. Son tu mejor medicamento natural.'},
-    {i:'😴',t:'El descanso es parte del entrenamiento. Los días sin gym son para recuperarse.'},
-    {i:'⏱️',t:'No aumentes peso ni tiempo más de un 10% por semana. El cuerpo necesita adaptarse poco a poco.'},
-    {i:'🧘',t:'Los estiramientos finales no son opcionales — reducen agujetas y mejoran flexibilidad.'},
-    {i:'❤️',t:'Si notas mareos, dolor en el pecho o falta de aire inusual, para y consulta a tu médico.'},
-  ];
-  m.innerHTML=`<div class="section-label">💡 Consejos para ti</div>`+
-    lista.map(c=>`<div class="consejo"><span class="consejo-icon">${c.i}</span><span>${c.t}</span></div>`).join('');
-}
-
-// ─── TOAST ────────────────────────────────────────────────────────────────────
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2000);
-}
-
-// ─── SERVICE WORKER
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js').catch(e=>console.log('SW:',e));
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW registrado:', reg)).catch(err => console.log('SW error:', err));
   });
 }
-let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{
-  e.preventDefault();deferredPrompt=e;
-  document.getElementById('installBtn').classList.add('show');
-});
-window.addEventListener('appinstalled',()=>{
-  document.getElementById('installBtn').classList.remove('show');
-  deferredPrompt=null;
-});
-function installApp(){
-  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>deferredPrompt=null);}
-  else showToast('📱 Usa el menú del navegador → Añadir a pantalla inicio');
-}
-setTimeout(()=>{
-  const btn=document.getElementById('installBtn');
-  if(!deferredPrompt&&/android|iphone|ipad/.test(navigator.userAgent.toLowerCase()))
-    btn.classList.add('show');
-},1500);
 
-// ─── ARRANQUE ─────────────────────────────────────────────────────────────────
 render();
 </script>
 </body>
