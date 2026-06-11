@@ -1,33 +1,36 @@
-// PWA INSTALL
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById('installBtn').classList.add('show');
-  console.log('✅ Instalación disponible');
+const CACHE_NAME = 'migym-v1';
+const urlsToCache = [
+  '/migym/',
+  '/migym/index.html',
+  '/migym/manifest.json',
+  '/migym/migym-192.png',
+  '/migym/migym-512.png'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+  );
 });
-document.getElementById('installBtn').addEventListener('click', async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    document.getElementById('installBtn').classList.remove('show');
-  } else {
-    showToast('📱 Abre el menú de Chrome → "Añadir a pantalla de inicio"');
-  }
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
+  );
 });
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/Migym/sw.js')
-      .then(reg => console.log('✅ SW registrado:', reg))
-      .catch(err => console.log('❌ SW error:', err));
-  });
-}
-window.addEventListener('appinstalled', () => {
-  document.getElementById('installBtn').classList.remove('show');
-  deferredPrompt = null;
-  showToast('🎉 App instalada');
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
+  );
 });
-if (window.matchMedia('(display-mode: standalone)').matches) {
-  document.getElementById('installBtn').style.display = 'none';
-}

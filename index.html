@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="MiGym">
 <title>MiGym Boni</title>
-<link rel="manifest" href="/Migym/manifest.json">
+<link rel="manifest" href="/migym/manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -239,7 +239,7 @@ function showToast(msg){ const t=document.getElementById('toast'); t.textContent
 
 document.querySelectorAll('.tab-btn').forEach(btn => { btn.addEventListener('click', () => setTab(btn.dataset.tab, btn)); });
 
-// ========== PWA INSTALL - CORREGIDO PARA GITHUB PAGES ==========
+// ========== PWA INSTALL ==========
 let deferredPrompt = null;
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -261,10 +261,9 @@ document.getElementById('installBtn').addEventListener('click', async () => {
   }
 });
 
-// Registrar Service Worker con la ruta correcta de GitHub Pages
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/Migym/sw.js')
+    navigator.serviceWorker.register('/migym/sw.js')
       .then(reg => console.log('✅ SW registrado:', reg))
       .catch(err => console.log('❌ SW error:', err));
   });
@@ -276,7 +275,6 @@ window.addEventListener('appinstalled', () => {
   showToast('🎉 App instalada correctamente');
 });
 
-// Ocultar botón si ya está instalada
 if (window.matchMedia('(display-mode: standalone)').matches) {
   document.getElementById('installBtn').style.display = 'none';
 }
