@@ -1,0 +1,14 @@
+{
+  "name": "MiGym Boni",
+  "short_name": "MiGym",
+  "description": "Plan de entrenamiento personalizado de Boni",
+  "start_url": "./migym.html",
+  "display": "standalone",
+  "background_color": "#0a1f1d",
+  "theme_color": "#0d9488",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "migym-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "migym-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

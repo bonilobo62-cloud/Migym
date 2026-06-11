@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0d9488">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MiGym">
+<title>MiGym Boni</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal-900:#0f3d38;--teal-800:#134e48;--teal-700:#0f766e;
+  --teal-600:#0d9488;--teal-500:#14b8a6;--teal-400:#2dd4bf;
+  --teal-300:#5eead4;--gold:#f59e0b;--gold-light:#fcd34d;
+  --dark:#0a1f1d;--card-bg:rgba(15,61,56,0.85);
+  --card-border:rgba(45,212,191,0.2);--text-main:#e2faf7;
+  --text-muted:#99d6d0;--radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--text-main);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 80% 60% at 10% 0%,rgba(20,184,166,.18) 0%,transparent 60%),
+  radial-gradient(ellipse 60% 40% at 90% 100%,rgba(13,148,136,.15) 0%,transparent 55%),
+  linear-gradient(160deg,#0a1f1d 0%,#071512 50%,#060e0d 100%);
+  pointer-events:none}
+
+header{position:sticky;top:0;z-index:100;background:rgba(10,31,29,.92);
+  backdrop-filter:blur(16px);border-bottom:1px solid var(--card-border);padding:14px 16px 10px}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.header-top h1{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;
+  color:var(--teal-300);letter-spacing:-.5px}
+.header-top h1 span{color:var(--gold)}
+.dia-badge{background:var(--teal-800);border:1px solid var(--teal-600);color:var(--teal-300);
+  font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:20px}
+
+.tabs-wrap{position:sticky;top:107px;z-index:90;background:rgba(10,31,29,.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--card-border);
+  overflow-x:auto;white-space:nowrap;padding:8px 12px;scrollbar-width:none}
+.tabs-wrap::-webkit-scrollbar{display:none}
+.tab-btn{display:inline-flex;align-items:center;gap:5px;background:transparent;
+  border:1px solid transparent;border-radius:10px;color:var(--text-muted);
+  font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;
+  padding:6px 12px;margin-right:6px;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:var(--teal-800);border-color:var(--teal-600);color:var(--teal-300)}
+
+main{position:relative;z-index:1;padding:16px 12px 100px;max-width:600px;margin:0 auto}
+
+.section-label{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;color:var(--teal-500);
+  margin:18px 0 8px 4px;display:flex;align-items:center;gap:8px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--card-border)}
+
+/* EJERCICIO CARD */
+.card{background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:var(--radius);margin-bottom:10px;overflow:hidden;
+  backdrop-filter:blur(8px);transition:border-color .2s}
+.card.done{border-color:var(--teal-600);opacity:.75}
+.card-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer}
+.card-check{width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--teal-800),var(--teal-700));
+  border:2px solid var(--teal-600);display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;cursor:pointer;transition:all .2s}
+.card.done .card-check{background:var(--teal-600);border-color:var(--teal-400)}
+.card-info{flex:1;min-width:0}
+.card-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--text-main)}
+.card-meta{font-size:.75rem;color:var(--text-muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+.meta-badge{background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);
+  color:var(--teal-400);border-radius:6px;padding:1px 7px;font-size:.68rem;font-weight:600}
+.card-arrow{color:var(--teal-500);font-size:.8rem;transition:transform .25s;flex-shrink:0}
+.card.expanded .card-arrow{transform:rotate(90deg)}
+.card-body{display:none;padding:0 16px 14px;border-top:1px solid rgba(45,212,191,.1)}
+.card.expanded .card-body{display:block}
+.descripcion{font-size:.85rem;color:var(--text-muted);margin:10px 0 8px;line-height:1.5}
+.pasos-list{list-style:none}
+.paso{display:flex;gap:10px;align-items:flex-start;padding:6px 0;
+  border-bottom:1px solid rgba(45,212,191,.06);font-size:.83rem;color:var(--text-main)}
+.paso:last-child{border-bottom:none}
+.paso-num{min-width:22px;height:22px;background:var(--teal-800);border:1px solid var(--teal-600);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;font-weight:700;color:var(--teal-300);flex-shrink:0;margin-top:1px}
+.cuidado{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);
+  border-radius:8px;padding:8px 10px;font-size:.78rem;color:#fca5a5;
+  margin-top:8px;display:flex;gap:6px;align-items:flex-start}
+
+.progreso-wrap{background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;backdrop-filter:blur(8px)}
+.progreso-titulo{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;
+  color:var(--teal-300);margin-bottom:10px}
+.progreso-bar{background:rgba(45,212,191,.1);border-radius:10px;height:8px;overflow:hidden;margin-bottom:6px}
+.progreso-fill{height:100%;background:linear-gradient(90deg,var(--teal-600),var(--teal-400));
+  border-radius:10px;transition:width .4s ease}
+.progreso-texto{font-size:.72rem;color:var(--text-muted);text-align:right}
+
+/* ASISTENCIA */
+.mes-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+.mes-header{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.mes-header span{text-align:center;font-size:.6rem;font-weight:700;
+  color:var(--text-muted);text-transform:uppercase}
+.dia-cal{aspect-ratio:1;border-radius:8px;border:1px solid var(--card-border);
+  display:flex;align-items:center;justify-content:center;font-size:.7rem;
+  color:var(--text-muted);cursor:pointer;transition:all .15s;background:rgba(15,61,56,.5)}
+.dia-cal.vacio{background:transparent;border-color:transparent;cursor:default}
+.dia-cal.hoy{border-color:var(--teal-500);color:var(--teal-300);font-weight:700}
+.dia-cal.profe{background:var(--teal-700);border-color:var(--teal-500);color:white}
+.dia-cal.libre{background:rgba(245,158,11,.3);border-color:var(--gold);color:var(--gold-light)}
+.dia-cal.ambos{background:linear-gradient(135deg,var(--teal-700),rgba(245,158,11,.5));
+  border-color:var(--teal-400);color:white}
+.leyenda{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.leyenda-item{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--text-muted)}
+.leyenda-dot{width:14px;height:14px;border-radius:4px;flex-shrink:0}
+.mes-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.mes-nav button{background:var(--teal-800);border:1px solid var(--teal-600);
+  color:var(--teal-300);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:.85rem}
+.mes-nav span{font-family:'Syne',sans-serif;font-weight:700;color:var(--text-main)}
+.tipo-btns{display:flex;gap:8px;margin-bottom:14px}
+.tipo-btn{flex:1;padding:10px;border-radius:10px;border:1px solid var(--card-border);
+  background:var(--card-bg);color:var(--text-muted);font-family:'DM Sans',sans-serif;
+  font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.tipo-btn.sel-profe{background:var(--teal-800);border-color:var(--teal-500);color:var(--teal-300)}
+.tipo-btn.sel-libre{background:rgba(245,158,11,.15);border-color:var(--gold);color:var(--gold-light)}
+.stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.stat-card{background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:12px;padding:12px;text-align:center;backdrop-filter:blur(8px)}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--teal-300)}
+.stat-label{font-size:.68rem;color:var(--text-muted);margin-top:2px}
+
+/* PESO */
+.peso-form{background:var(--card-bg);border:1px solid var(--card-border);
+  border-radius:var(--radius);padding:16px;margin-bottom:16px;backdrop-filter:blur(8px)}
+.peso-form label{display:block;font-size:.75rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:.8px;color:var(--teal-400);margin-bottom:6px}
+.peso-input-row{display:flex;gap:8px;align-items:center}
+.peso-input{flex:1;background:rgba(20,184,166,.08);border:1px solid var(--card-border);
+  border-radius:10px;padding:10px 14px;color:var(--text-main);
+  font-family:'DM Sans',sans-serif;font-size:1.1rem;font-weight:600;outline:none}
+.peso-input:focus{border-color:var(--teal-500)}
+.peso-save-btn{background:linear-gradient(135deg,var(--teal-500),var(--teal-700));
+  border:none;border-radius:10px;color:white;font-family:'Syne',sans-serif;
+  font-size:.85rem;font-weight:700;padding:10px 18px;cursor:pointer}
+.peso-list{list-style:none}
+.peso-item{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid rgba(45,212,191,.08)}
+.peso-item:last-child{border-bottom:none}
+.peso-mes{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--text-main)}
+.peso-val{font-size:1.1rem;font-weight:700;color:var(--teal-300)}
+.peso-diff{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:8px}
+.peso-diff.baja{background:rgba(20,184,166,.15);color:var(--teal-400)}
+.peso-diff.sube{background:rgba(239,68,68,.15);color:#fca5a5}
+.peso-diff.igual{background:rgba(100,116,139,.15);color:#94a3b8}
+.peso-del{background:transparent;border:none;color:var(--text-muted);cursor:pointer;font-size:.9rem;padding:4px}
+
+/* CONSEJOS */
+.consejo{background:rgba(20,184,166,.08);border:1px solid var(--card-border);
+  border-radius:12px;padding:12px 14px;margin-bottom:10px;
+  font-size:.83rem;color:var(--text-muted);line-height:1.5;display:flex;gap:8px}
+.consejo-icon{font-size:1.1rem;flex-shrink:0}
+
+.reset-btn{width:100%;background:rgba(20,184,166,.1);border:1px solid var(--teal-700);
+  color:var(--teal-300);border-radius:12px;padding:12px;font-family:'Syne',sans-serif;
+  font-size:.9rem;font-weight:700;cursor:pointer;margin-top:10px;transition:all .2s}
+.reset-btn:active{background:var(--teal-800)}
+
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--teal-700);color:white;padding:10px 22px;border-radius:20px;
+  font-size:.85rem;font-weight:600;opacity:0;transition:all .3s;z-index:999;
+  pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>💪 Mi<span>Gym</span></h1>
+    <span class="dia-badge" id="diaBadge"></span>
+  </div>
+</header>
+
+<div class="tabs-wrap">
+  <button class="tab-btn active" onclick="setTab('gym',this)">🏋️ Gym Libre</button>
+  <button class="tab-btn" onclick="setTab('asistencia',this)">📅 Asistencia</button>
+  <button class="tab-btn" onclick="setTab('peso',this)">⚖️ Mi Peso</button>
+  <button class="tab-btn" onclick="setTab('consejos',this)">💡 Consejos</button>
+</div>
+
+<main id="main"></main>
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATOS EJERCICIOS ─────────────────────────────────────────────────────────
+const EJERCICIOS = {
+  calentamiento:[
+    {id:'c1',icono:'🔥',nombre:'Calentamiento articular',series:'1 ronda',duracion:'5 min',
+     descripcion:'Movilización suave de todas las articulaciones antes de empezar.',
+     pasos:['Rotaciones de cuello: 5 veces a cada lado, lento y suave',
+            'Rotaciones de hombros: 10 hacia adelante y 10 hacia atrás',
+            'Rotaciones de muñecas: 10 veces a cada lado (suave por la artrosis)',
+            'Rotaciones de caderas: 10 círculos a cada lado',
+            'Rotaciones de tobillos: 10 veces a cada pie',
+            'Marcha en el sitio: 1 minuto levantando rodillas suavemente'],
+     cuidado:'Muñecas: movimientos muy suaves. Para si sientes dolor agudo.'}
+  ],
+  cardio:[
+    {id:'l1',icono:'🚴',nombre:'Bicicleta estática',series:'20-30 min',duracion:'20-30 min',
+     descripcion:'Cardio ideal: sin impacto en pies y excelente para bajar glucosa y triglicéridos.',
+     pasos:['Ajusta el sillín: rodilla ligeramente doblada al fondo del pedaleo',
+            'Empieza 5 min a ritmo muy suave para calentar',
+            'Sube a ritmo moderado: puedes hablar pero notas el esfuerzo',
+            'Mantén 20-25 min a ritmo constante',
+            'Últimos 5 min baja el ritmo para enfriar'],
+     cuidado:'Fascitis plantar: apoya bien el pie en el pedal, pedalea con la parte media.'},
+    {id:'l2',icono:'🚶',nombre:'Cinta andadora (caminar)',series:'20-25 min',duracion:'20-25 min',
+     descripcion:'Caminar rápido en cinta. Sin correr — igual de efectivo y sin impacto.',
+     pasos:['Velocidad: 4.5-5.5 km/h (paso rápido, nunca correr)',
+            'Inclinación: 1-2% para simular terreno real',
+            'Postura: espalda recta, mirada al frente, brazos en movimiento',
+            'Camina 20-25 minutos continuos',
+            'Para si el pie molesta'],
+     cuidado:'Fascitis: usa calzado con buena amortiguación. Para si duele el talón.'}
+  ],
+  maquinas:[
+    {id:'m1',icono:'🦵',nombre:'Leg press (prensa de piernas)',series:'3×12 rep',duracion:'12 min',
+     descripcion:'Trabaja cuádriceps y glúteos sin carga en columna.',
+     pasos:['Ajusta el asiento: rodillas a 90° en posición inicial',
+            'Pies al ancho de hombros en la plataforma',
+            'Empuja extendiendo las piernas sin bloquear rodillas',
+            'Baja lentamente hasta 90° de flexión',
+            'Empieza con poco peso y aumenta gradualmente'],
+     cuidado:'Fascitis: apoya bien toda la planta en la plataforma.'},
+    {id:'m2',icono:'🏋️',nombre:'Remo en máquina (espalda)',series:'3×12 rep',duracion:'12 min',
+     descripcion:'Fortalece espalda media y mejora postura. Muy recomendado.',
+     pasos:['Siéntate erguido, pecho contra el soporte',
+            'Agarra las asas, codos hacia atrás',
+            'Tira hacia el abdomen apretando los omóplatos',
+            'Extiende los brazos lentamente volviendo al inicio',
+            'Espalda recta durante todo el movimiento'],
+     cuidado:'Artrosis: agarre suave. Usa guantes con acolchado si las asas duelen.'},
+    {id:'m3',icono:'🦵',nombre:'Extensión de cuádriceps',series:'3×12 rep',duracion:'10 min',
+     descripcion:'Aísla y fortalece la parte delantera del muslo.',
+     pasos:['Siéntate con espalda bien apoyada',
+            'Coloca los tobillos bajo el rodillo acolchado',
+            'Extiende las piernas hacia arriba lentamente',
+            'Aguanta 1 segundo arriba y baja controlando',
+            'Mejor muchas repeticiones que mucho peso'],
+     cuidado:null},
+    {id:'m4',icono:'🦵',nombre:'Curl femoral (isquiotibiales)',series:'3×12 rep',duracion:'10 min',
+     descripcion:'Trabaja la parte posterior del muslo.',
+     pasos:['Colócate según la máquina (tumbado o sentado)',
+            'Coloca los tobillos bajo el rodillo',
+            'Dobla las rodillas llevando talones hacia glúteos',
+            'Baja lentamente y con control',
+            'Peso ligero, movimiento controlado'],
+     cuidado:null},
+    {id:'m5',icono:'💪',nombre:'Polea alta (jalón al pecho)',series:'3×10 rep',duracion:'10 min',
+     descripcion:'Trabaja dorsal y bíceps. Excelente para espalda y postura.',
+     pasos:['Siéntate con muslos bajo el soporte, agarra la barra ancha',
+            'Tira hacia el pecho (nunca detrás del cuello)',
+            'Mantén espalda ligeramente inclinada hacia atrás',
+            'Sube lentamente controlando el peso',
+            'Agarre neutro (palmas enfrentadas) si las muñecas molestan'],
+     cuidado:'Artrosis: usa agarre neutro si el ancho duele.'}
+  ],
+  estiramientos:[
+    {id:'e1',icono:'🧘',nombre:'Estiramientos finales',series:'1 ronda',duracion:'8 min',
+     descripcion:'Imprescindibles para recuperar y evitar agujetas.',
+     pasos:['Dorsal: agárrate a algo fijo, inclina el cuerpo y estira. 30 seg',
+            'Cuádriceps: de pie, dobla una rodilla, talón al glúteo. 30 seg cada lado',
+            'Isquiotibiales: sentado, estira la pierna y alcanza el pie. 30 seg',
+            'Pecho: brazos abiertos hacia atrás, abre el pecho. 30 seg',
+            '5 respiraciones profundas para cerrar la sesión'],
+     cuidado:null}
+  ]
+};
+
+const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                  'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DIAS_ES = ['L','M','X','J','V','S','D'];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let activeTab = 'gym';
+let completados = JSON.parse(localStorage.getItem('migym_ej') || '{}');
+let asistencia = JSON.parse(localStorage.getItem('migym_asist') || '{}');
+let pesos = JSON.parse(localStorage.getItem('migym_pesos') || '[]');
+let tipoSel = 'profe'; // para marcar asistencia
+let calMes = new Date().getMonth();
+let calAnio = new Date().getFullYear();
+
+const hoy = new Date();
+const diasGym = [1,3,5]; // lunes=1, miércoles=3, viernes=5
+const esGymHoy = diasGym.includes(hoy.getDay());
+document.getElementById('diaBadge').textContent =
+  MESES_ES[hoy.getMonth()].slice(0,3) + ' ' + hoy.getDate() + (esGymHoy ? ' 💪' : '');
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function setTab(tab, btn) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function render() {
+  const m = document.getElementById('main');
+  if (activeTab==='gym') renderGym(m);
+  else if (activeTab==='asistencia') renderAsistencia(m);
+  else if (activeTab==='peso') renderPeso(m);
+  else renderConsejos(m);
+}
+
+// ─── GYM ──────────────────────────────────────────────────────────────────────
+function renderGym(m) {
+  const todos = [...EJERCICIOS.calentamiento,...EJERCICIOS.cardio,...EJERCICIOS.maquinas,...EJERCICIOS.estiramientos];
+  const hechos = todos.filter(e=>completados[e.id]).length;
+  const pct = Math.round((hechos/todos.length)*100);
+  m.innerHTML =
+    `<div class="progreso-wrap">
+      <div class="progreso-titulo">Progreso de la sesión</div>
+      <div class="progreso-bar"><div class="progreso-fill" style="width:${pct}%"></div></div>
+      <div class="progreso-texto">${hechos} de ${todos.length} completados (${pct}%)</div>
+    </div>` +
+    seccion('🔥 Calentamiento', EJERCICIOS.calentamiento) +
+    seccion('🚴 Cardio', EJERCICIOS.cardio) +
+    seccion('🏋️ Máquinas', EJERCICIOS.maquinas) +
+    seccion('🧘 Estiramientos', EJERCICIOS.estiramientos) +
+    `<button class="reset-btn" onclick="resetGym()">🔄 Reiniciar sesión</button>`;
+  bindCards();
+}
+
+function seccion(titulo, lista) {
+  return `<div class="section-label">${titulo}</div>` + lista.map(cardHTML).join('');
+}
+
+function cardHTML(e) {
+  const done = completados[e.id]?'done':'';
+  const check = completados[e.id]?'✓':e.icono;
+  return `<div class="card ${done}" id="card_${e.id}">
+    <div class="card-header">
+      <div class="card-check" data-id="${e.id}">${check}</div>
+      <div class="card-info">
+        <div class="card-title">${e.nombre}</div>
+        <div class="card-meta">
+          <span class="meta-badge">${e.series}</span>
+          <span class="meta-badge">${e.duracion}</span>
+        </div>
+      </div>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <div class="descripcion">${e.descripcion}</div>
+      <ul class="pasos-list">${e.pasos.map((p,i)=>`<li class="paso"><span class="paso-num">${i+1}</span><span>${p}</span></li>`).join('')}</ul>
+      ${e.cuidado?`<div class="cuidado">⚠️ <span>${e.cuidado}</span></div>`:''}
+    </div>
+  </div>`;
+}
+
+function bindCards() {
+  document.querySelectorAll('.card-check').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const id=btn.dataset.id;
+      completados[id]=!completados[id];
+      localStorage.setItem('migym_ej',JSON.stringify(completados));
+      showToast(completados[id]?'✅ ¡Completado!':'↩️ Desmarcado');
+      renderGym(document.getElementById('main'));
+    });
+  });
+  document.querySelectorAll('.card-header').forEach(h=>{
+    h.addEventListener('click',e=>{
+      if(e.target.closest('.card-check'))return;
+      const card=h.closest('.card');
+      card.classList.toggle('expanded');
+    });
+  });
+}
+
+function resetGym(){
+  completados={};
+  localStorage.setItem('migym_ej',JSON.stringify(completados));
+  renderGym(document.getElementById('main'));
+  showToast('🔄 Sesión reiniciada');
+}
+
+// ─── ASISTENCIA ───────────────────────────────────────────────────────────────
+function renderAsistencia(m) {
+  const año=calAnio, mes=calMes;
+  const primerDia=new Date(año,mes,1).getDay();
+  const offset=primerDia===0?6:primerDia-1;
+  const diasMes=new Date(año,mes+1,0).getDate();
+
+  // stats del mes
+  const prefix=`${año}-${String(mes+1).padStart(2,'0')}`;
+  let cntProfe=0,cntLibre=0,cntAmbos=0;
+  for(let d=1;d<=diasMes;d++){
+    const key=`${prefix}-${String(d).padStart(2,'0')}`;
+    const v=asistencia[key];
+    if(v==='ambos')cntAmbos++;
+    else if(v==='profe')cntProfe++;
+    else if(v==='libre')cntLibre++;
+  }
+
+  m.innerHTML=`
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num">${cntProfe+cntAmbos}</div><div class="stat-label">Con Profesor</div></div>
+      <div class="stat-card"><div class="stat-num">${cntLibre+cntAmbos}</div><div class="stat-label">Gym Libre</div></div>
+      <div class="stat-card"><div class="stat-num">${cntProfe+cntLibre+cntAmbos}</div><div class="stat-label">Total días</div></div>
+    </div>
+    <div class="card" style="padding:14px 16px;margin-bottom:14px">
+      <div class="mes-nav">
+        <button onclick="cambiaMes(-1)">◀</button>
+        <span>${MESES_ES[mes]} ${año}</span>
+        <button onclick="cambiaMes(1)">▶</button>
+      </div>
+      <p style="font-size:.75rem;color:var(--text-muted);margin-bottom:10px">Pulsa un día para marcar tu asistencia:</p>
+      <div class="tipo-btns">
+        <button class="tipo-btn ${tipoSel==='profe'?'sel-profe':''}" onclick="selTipo('profe',this)">🧘 Con Profesor</button>
+        <button class="tipo-btn ${tipoSel==='libre'?'sel-libre':''}" onclick="selTipo('libre',this)">🏋️ Gym Libre</button>
+      </div>
+      <div class="mes-header">${DIAS_ES.map(d=>`<span>${d}</span>`).join('')}</div>
+      <div class="mes-grid">
+        ${Array(offset).fill('<div class="dia-cal vacio"></div>').join('')}
+        ${Array.from({length:diasMes},(_,i)=>{
+          const d=i+1;
+          const key=`${prefix}-${String(d).padStart(2,'0')}`;
+          const v=asistencia[key]||'';
+          const hoyClass=(d===hoy.getDate()&&mes===hoy.getMonth()&&año===hoy.getFullYear())?'hoy':'';
+          return `<div class="dia-cal ${v} ${hoyClass}" onclick="toggleDia('${key}')">${d}</div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="leyenda">
+      <div class="leyenda-item"><div class="leyenda-dot" style="background:var(--teal-700)"></div>Con Profesor</div>
+      <div class="leyenda-item"><div class="leyenda-dot" style="background:rgba(245,158,11,.3)"></div>Gym Libre</div>
+      <div class="leyenda-item"><div class="leyenda-dot" style="background:linear-gradient(135deg,var(--teal-700),rgba(245,158,11,.5))"></div>Ambos</div>
+    </div>`;
+}
+
+function selTipo(tipo, btn) {
+  tipoSel=tipo;
+  document.querySelectorAll('.tipo-btn').forEach(b=>b.className='tipo-btn');
+  btn.classList.add(tipo==='profe'?'sel-profe':'sel-libre');
+}
+
+function toggleDia(key) {
+  const v=asistencia[key]||'';
+  if(!v) asistencia[key]=tipoSel;
+  else if(v===tipoSel) delete asistencia[key];
+  else if((v==='profe'&&tipoSel==='libre')||(v==='libre'&&tipoSel==='profe')) asistencia[key]='ambos';
+  else delete asistencia[key];
+  localStorage.setItem('migym_asist',JSON.stringify(asistencia));
+  renderAsistencia(document.getElementById('main'));
+}
+
+function cambiaMes(dir) {
+  calMes+=dir;
+  if(calMes>11){calMes=0;calAnio++;}
+  if(calMes<0){calMes=11;calAnio--;}
+  renderAsistencia(document.getElementById('main'));
+}
+
+// ─── PESO ─────────────────────────────────────────────────────────────────────
+function renderPeso(m) {
+  const mesActual=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+  const yaHoy=pesos.find(p=>p.mes===mesActual);
+
+  m.innerHTML=`
+    <div class="peso-form">
+      <label>Registrar peso de ${MESES_ES[hoy.getMonth()]} ${hoy.getFullYear()}</label>
+      <div class="peso-input-row">
+        <input class="peso-input" type="number" id="pesoInput" step="0.1" min="40" max="200"
+          placeholder="${yaHoy?yaHoy.kg+' kg':'ej: 82.5'}" value="${yaHoy?yaHoy.kg:''}">
+        <button class="peso-save-btn" onclick="guardarPeso()">💾 Guardar</button>
+      </div>
+    </div>
+    ${pesos.length===0?
+      `<div class="consejo"><span class="consejo-icon">⚖️</span><span>Aún no hay registros. Añade tu peso de este mes para empezar a ver la evolución.</span></div>`:
+      `<div class="section-label">📊 Evolución del peso</div>
+       <div class="card" style="overflow:visible">
+        <ul class="peso-list" style="padding:0 16px">
+          ${[...pesos].reverse().map((p,i,arr)=>{
+            const prev=arr[i+1];
+            let diff='',diffClass='igual';
+            if(prev){
+              const d=(p.kg-prev.kg).toFixed(1);
+              diff=d>0?`+${d} kg`:d<0?`${d} kg`:'=';
+              diffClass=d<0?'baja':d>0?'sube':'igual';
+            }
+            return `<li class="peso-item">
+              <span class="peso-mes">${p.label}</span>
+              <span class="peso-val">${p.kg} kg</span>
+              <span class="peso-diff ${diffClass}">${diff}</span>
+              <button class="peso-del" onclick="borrarPeso('${p.mes}')">🗑️</button>
+            </li>`;
+          }).join('')}
+        </ul>
+       </div>`
+    }`;
+}
+
+function guardarPeso() {
+  const val=parseFloat(document.getElementById('pesoInput').value);
+  if(isNaN(val)||val<40||val>200){showToast('⚠️ Peso no válido');return;}
+  const mes=`${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+  const label=`${MESES_ES[hoy.getMonth()]} ${hoy.getFullYear()}`;
+  pesos=pesos.filter(p=>p.mes!==mes);
+  pesos.push({mes,label,kg:val});
+  pesos.sort((a,b)=>a.mes.localeCompare(b.mes));
+  localStorage.setItem('migym_pesos',JSON.stringify(pesos));
+  showToast('✅ Peso guardado');
+  renderPeso(document.getElementById('main'));
+}
+
+function borrarPeso(mes) {
+  pesos=pesos.filter(p=>p.mes!==mes);
+  localStorage.setItem('migym_pesos',JSON.stringify(pesos));
+  renderPeso(document.getElementById('main'));
+}
+
+// ─── CONSEJOS ────────────────────────────────────────────────────────────────
+function renderConsejos(m) {
+  const lista=[
+    {i:'💊',t:'Toma la pastilla de tensión antes del gym, no después. El ejercicio ya la baja ligeramente.'},
+    {i:'💧',t:'Bebe mínimo 500ml de agua durante el entrenamiento. Con glucosa alta la hidratación es clave.'},
+    {i:'🦶',t:'Fascitis plantar: usa plantillas de gel. Estira el pie al levantarte por la mañana antes del primer paso.'},
+    {i:'🤲',t:'Artrosis de manos: no aprietes fuerte los agarres. Guantes con acolchado ayudan mucho.'},
+    {i:'🍽️',t:'Días de gym: desayuna bien 1 hora antes. Avena con leche semidesnatada o huevos son ideales.'},
+    {i:'📈',t:'La bicicleta y caminar bajan directamente la glucosa y los triglicéridos. Son tu mejor medicamento natural.'},
+    {i:'😴',t:'El descanso es parte del entrenamiento. Los días sin gym son para recuperarse.'},
+    {i:'⏱️',t:'No aumentes peso ni tiempo más de un 10% por semana. El cuerpo necesita adaptarse poco a poco.'},
+    {i:'🧘',t:'Los estiramientos finales no son opcionales — reducen agujetas y mejoran flexibilidad.'},
+    {i:'❤️',t:'Si notas mareos, dolor en el pecho o falta de aire inusual, para y consulta a tu médico.'},
+  ];
+  m.innerHTML=`<div class="section-label">💡 Consejos para ti</div>`+
+    lista.map(c=>`<div class="consejo"><span class="consejo-icon">${c.i}</span><span>${c.t}</span></div>`).join('');
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+render();
+</script>
+</body>
+</html>
