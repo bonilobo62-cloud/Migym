@@ -27,25 +27,33 @@ body::before{content:'';position:fixed;inset:0;z-index:0;
   pointer-events:none}
 
 header{position:sticky;top:0;z-index:100;background:rgba(10,31,29,.92);
-  backdrop-filter:blur(16px);border-bottom:1px solid var(--card-border);padding:14px 16px 10px}
+  backdrop-filter:blur(16px);border-bottom:1px solid var(--card-border);padding:14px 16px 10px;
+  max-width:100%}
+.header-inner{max-width:700px;margin:0 auto}
 .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .header-top h1{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;
   color:var(--teal-300);letter-spacing:-.5px}
 .header-top h1 span{color:var(--gold)}
+.header-right{display:flex;align-items:center;gap:8px}
 .dia-badge{background:var(--teal-800);border:1px solid var(--teal-600);color:var(--teal-300);
   font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:20px}
+.install-btn{background:var(--teal-600);color:#fff;border:none;border-radius:10px;
+  padding:6px 12px;font-size:.75rem;font-weight:700;cursor:pointer;
+  display:none;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.install-btn.show{display:flex}
 
 .tabs-wrap{position:sticky;top:107px;z-index:90;background:rgba(10,31,29,.92);
   backdrop-filter:blur(12px);border-bottom:1px solid var(--card-border);
   overflow-x:auto;white-space:nowrap;padding:8px 12px;scrollbar-width:none}
 .tabs-wrap::-webkit-scrollbar{display:none}
+.tabs-inner{max-width:700px;margin:0 auto}
 .tab-btn{display:inline-flex;align-items:center;gap:5px;background:transparent;
   border:1px solid transparent;border-radius:10px;color:var(--text-muted);
   font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;
   padding:6px 12px;margin-right:6px;cursor:pointer;transition:all .2s}
 .tab-btn.active{background:var(--teal-800);border-color:var(--teal-600);color:var(--teal-300)}
 
-main{position:relative;z-index:1;padding:16px 12px 100px;max-width:600px;margin:0 auto}
+main{position:relative;z-index:1;padding:16px 12px 100px;max-width:700px;margin:0 auto}
 
 .section-label{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;
   letter-spacing:2px;text-transform:uppercase;color:var(--teal-500);
@@ -172,17 +180,24 @@ main{position:relative;z-index:1;padding:16px 12px 100px;max-width:600px;margin:
 <body>
 
 <header>
-  <div class="header-top">
-    <h1>💪 Mi<span>Gym</span></h1>
-    <span class="dia-badge" id="diaBadge"></span>
+  <div class="header-inner">
+    <div class="header-top">
+      <h1>💪 Mi<span>Gym</span></h1>
+      <div class="header-right">
+        <button class="install-btn" id="installBtn" onclick="installApp()">⬇️ Instalar</button>
+        <span class="dia-badge" id="diaBadge"></span>
+      </div>
+    </div>
   </div>
 </header>
 
 <div class="tabs-wrap">
+  <div class="tabs-inner">
   <button class="tab-btn active" onclick="setTab('gym',this)">🏋️ Gym Libre</button>
   <button class="tab-btn" onclick="setTab('asistencia',this)">📅 Asistencia</button>
   <button class="tab-btn" onclick="setTab('peso',this)">⚖️ Mi Peso</button>
   <button class="tab-btn" onclick="setTab('consejos',this)">💡 Consejos</button>
+  </div>
 </div>
 
 <main id="main"></main>
@@ -542,6 +557,32 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2000);
 }
 
+// ─── SERVICE WORKER
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(e=>console.log('SW:',e));
+  });
+}
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  document.getElementById('installBtn').classList.add('show');
+});
+window.addEventListener('appinstalled',()=>{
+  document.getElementById('installBtn').classList.remove('show');
+  deferredPrompt=null;
+});
+function installApp(){
+  if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>deferredPrompt=null);}
+  else showToast('📱 Usa el menú del navegador → Añadir a pantalla inicio');
+}
+setTimeout(()=>{
+  const btn=document.getElementById('installBtn');
+  if(!deferredPrompt&&/android|iphone|ipad/.test(navigator.userAgent.toLowerCase()))
+    btn.classList.add('show');
+},1500);
+
+// ─── ARRANQUE ─────────────────────────────────────────────────────────────────
 render();
 </script>
 </body>
