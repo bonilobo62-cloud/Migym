@@ -239,29 +239,38 @@ function showToast(msg){ const t=document.getElementById('toast'); t.textContent
 
 document.querySelectorAll('.tab-btn').forEach(btn => { btn.addEventListener('click', () => setTab(btn.dataset.tab, btn)); });
 
+// PWA INSTALL
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  document.getElementById('installBtn').style.display = 'flex';
+  document.getElementById('installBtn').classList.add('show');
+  console.log('✅ Instalación disponible');
 });
-document.getElementById('installBtn').addEventListener('click', () => {
+document.getElementById('installBtn').addEventListener('click', async () => {
   if (deferredPrompt) {
     deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('installBtn').classList.remove('show');
   } else {
-    showToast('📱 Usa el menú del navegador → Añadir a pantalla inicio');
+    showToast('📱 Abre este sitio en Chrome y toca "Añadir a pantalla de inicio"');
   }
 });
-window.addEventListener('appinstalled', () => {
-  document.getElementById('installBtn').style.display = 'none';
-  deferredPrompt = null;
-});
-
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW registrado:', reg)).catch(err => console.log('SW error:', err));
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('✅ SW registrado:', reg))
+      .catch(err => console.log('❌ SW error:', err));
   });
+}
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBtn').classList.remove('show');
+  deferredPrompt = null;
+  showToast('🎉 App instalada');
+});
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  document.getElementById('installBtn').style.display = 'none';
 }
 
 render();
