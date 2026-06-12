@@ -1,10 +1,10 @@
-const CACHE_NAME = 'migym-v1';
+const CACHE_NAME = 'migym-v2';
 const urlsToCache = [
-  '/migym/',
-  '/migym/index.html',
-  '/migym/manifest.json',
-  '/migym/migym-192.png',
-  '/migym/migym-512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './migym-192.png',
+  './migym-512.png'
 ];
 
 self.addEventListener('install', event => {
